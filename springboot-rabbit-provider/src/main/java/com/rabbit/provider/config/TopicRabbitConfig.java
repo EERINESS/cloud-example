@@ -15,32 +15,32 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class TopicRabbitConfig {
-    // 绑定键
+    //绑定键
     public final static String man = "topic.man";
-    public final static String woman = "topic.#";
+    public final static String woman = "topic.woman";
 
     @Bean
-    public Queue firstQueue(){
+    public Queue firstQueue() {
         return new Queue(TopicRabbitConfig.man);
     }
 
     @Bean
-    public Queue secondQueue(){
+    public Queue secondQueue() {
         return new Queue(TopicRabbitConfig.woman);
     }
 
     @Bean
-    TopicExchange exchange(){
+    TopicExchange exchange() {
         return new TopicExchange("topicExchange");
     }
 
     /**
-     * 将 firstQueue 和 topicExchange 绑定，而且绑定的键值为 topic.man
-     * 这样只要消息携带的路由键是 topic.man, 才会分发到该队列
+     * 将firstQueue和topicExchange绑定,而且绑定的键值为topic.man
+     * 这样只要是消息携带的路由键是topic.man,才会分发到该队列
      * @return
      */
     @Bean
-    Binding bindingExchangeMessage(){
+    Binding bindingExchangeMessage() {
         return BindingBuilder.bind(firstQueue()).to(exchange()).with(man);
     }
 
@@ -50,7 +50,8 @@ public class TopicRabbitConfig {
      * @return
      */
     @Bean
-    Binding bindingExchangeMessage2(){
-        return BindingBuilder.bind(secondQueue()).to(exchange()).with(woman);
+    Binding bindingExchangeMessage2() {
+        return BindingBuilder.bind(secondQueue()).to(exchange()).with("topic.#");
     }
+
 }

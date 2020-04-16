@@ -27,7 +27,7 @@ public class SendMessageController {
     @GetMapping("/sendDirectMessage")
     public String sendDirectMessage(){
         String messageId = String.valueOf(UUID.randomUUID());
-        log.info(String.format("sendDirectMessage messageId : ", messageId));
+        log.info(String.format("sendDirectMessage messageId : %s", messageId));
         String messageData = "Test Message, Hello!";
         Map<String, Object> map = new HashMap<>();
         map.put("messageId",messageId);
@@ -41,7 +41,7 @@ public class SendMessageController {
     @GetMapping("/sendTopicMessage1")
     public String sendTopicMessage1() {
         String messageId = String.valueOf(UUID.randomUUID());
-        log.info(String.format("sendTopicMessage1 messageId : ", messageId));
+        log.info(String.format("sendTopicMessage1 messageId : %s", messageId));
         String messageData = "message: M A N ";
         Map<String, Object> manMap = new HashMap<>();
         manMap.put("messageId", messageId);
@@ -54,7 +54,7 @@ public class SendMessageController {
     @GetMapping("/sendTopicMessage2")
     public String sendTopicMessage2() {
         String messageId = String.valueOf(UUID.randomUUID());
-        log.info(String.format("sendDirectMessage2 messageId : ", messageId));
+        log.info(String.format("sendDirectMessage2 messageId : %s", messageId));
         String messageData = "message: woman is all ";
         Map<String, Object> womanMap = new HashMap<>();
         womanMap.put("messageId", messageId);
@@ -62,5 +62,41 @@ public class SendMessageController {
         womanMap.put("createTime", createTime);
         rabbitTemplate.convertAndSend("topicExchange", "topic.woman", womanMap);
         return "SUCCESS";
+    }
+
+    @GetMapping("/sendFanoutMessage")
+    public String sendFanoutMessage() {
+        String messageId = String.valueOf(UUID.randomUUID());
+        String messageData = "message: testFanoutMessage ";
+        Map<String, Object> map = new HashMap<>();
+        map.put("messageId", messageId);
+        map.put("messageData", messageData);
+        map.put("createTime", createTime);
+        rabbitTemplate.convertAndSend("fanoutExchange", null, map);
+        return "SUCCESS";
+    }
+
+    @GetMapping("/TestMessageAck")
+    public String TestMessageAck() {
+        String messageId = String.valueOf(UUID.randomUUID());
+        String messageData = "message: non-existent-exchange test message ";
+        Map<String, Object> map = new HashMap<>();
+        map.put("messageId", messageId);
+        map.put("messageData", messageData);
+        map.put("createTime", createTime);
+        rabbitTemplate.convertAndSend("non-existent-exchange", "TestDirectRouting", map);
+        return "SUCCESS";
+    }
+
+    @GetMapping("/TestMessageAck2")
+    public String TestMessageAck2() {
+        String messageId = String.valueOf(UUID.randomUUID());
+        String messageData = "message: lonelyDirectExchange test message ";
+        Map<String, Object> map = new HashMap<>();
+        map.put("messageId", messageId);
+        map.put("messageData", messageData);
+        map.put("createTime", createTime);
+        rabbitTemplate.convertAndSend("lonelyDirectExchange", "TestDirectRouting", map);
+        return "ok";
     }
 }

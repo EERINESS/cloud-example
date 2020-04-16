@@ -17,6 +17,6 @@ public class TopicManReceiver {
 
     @RabbitHandler
     public void process(Map testMessage) {
-        log.info(String.format("TopicManReceiver 消费者收到的消息： %s" + testMessage.toString()));
+        log.info(String.format("TopicManReceiver 消费者收到的消息： %s", testMessage.toString()));
     }
 }
