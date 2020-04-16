@@ -1,4 +1,4 @@
-import org.junit.Test;
+package test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,8 +6,8 @@ import java.util.Map;
 /**
  * Created by zzq on 2020/4/16.
  */
-public class JavaTest {
-    @Test
+public class Test {
+    @org.junit.Test
     public void test(){
         Map<String, String> map = new HashMap();
         map.put("我","我的内容");
