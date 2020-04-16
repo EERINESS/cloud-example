@@ -3,9 +3,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
-    <modules>
-        <module>test-example</module>
-    </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -17,5 +14,12 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>cloud-example</name>
     <description>Demo project for Spring Boot</description>
+
+    <modules>
+        <module>test-example</module>
+        <module>springboot-rabbit-provider</module>
+        <module>springboot-rabbit-consumer</module>
+        <module>springboot-websocket</module>
+    </modules>
 
 </project>
