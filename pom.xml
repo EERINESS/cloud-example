@@ -20,6 +20,7 @@
         <module>springboot-rabbit-provider</module>
         <module>springboot-rabbit-consumer</module>
         <module>springboot-websocket</module>
+        <module>springboot-rabbitmq-websocket</module>
     </modules>
 
 </project>
