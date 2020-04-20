@@ -31,7 +31,7 @@ public class MyWebsocket {
     public void onOpen(Session session){
         this.session = session;
         websocketSet.add(this); // 加入Set中
-        log.info("成功连接一");
+        log.info(String.format("有新连接加入, 当前连接数: %d", websocketSet.size()));
     }
 
     /**
@@ -40,7 +40,7 @@ public class MyWebsocket {
     @OnClose
     public void onClose(){
         websocketSet.remove(this);  // 从 set 中删除
-        log.info("一连接关闭");
+        log.info(String.format("有一连接关闭, 当前连接数: %d", websocketSet.size()));
     }
 
     /**
