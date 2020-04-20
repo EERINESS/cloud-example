@@ -38,7 +38,8 @@ public class MyWebsocket {
         map.put(session.getId(), session);
         websocketSet.add(this); // 加入Set中
         System.out.println("有新连接加入:" + nickname + ", 当前在线人数为：" + websocketSet.size());
-        this.session.getAsyncRemote().sendText("恭喜" + nickname + "成功连接上WebSocket(其频道号：" + session.getId() + ")-->当前在线人数为：" + websocketSet.size());
+        //this.session.getAsyncRemote().sendText("恭喜" + nickname + "成功连接上WebSocket(其频道号：" + session.getId() + ")-->当前在线人数为：" + websocketSet.size());
+        broadcast("恭喜" + nickname + "成功连接上WebSocket(其频道号：" + session.getId() + ")-->当前在线人数为：" + websocketSet.size());
     }
 
     /**
