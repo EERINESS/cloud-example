@@ -44,7 +44,7 @@ public class MyWebsocket {
     }
 
     /**
-     * 有 rabbit 订阅的消息收到，发送给前端
+     * 收到客户端消息后调用的方法
      * @param message
      */
     @OnMessage
@@ -52,6 +52,10 @@ public class MyWebsocket {
         sendMessage(message);
     }
 
+    /**
+     * 有 rabbit 订阅的消息收到，发送给前端
+     * @param message
+     */
     public void sendMessage(String message){
         log.info(message);
         ObjectMapper objectMapper = new ObjectMapper();

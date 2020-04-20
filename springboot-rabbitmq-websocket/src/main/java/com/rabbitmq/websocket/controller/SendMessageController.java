@@ -33,5 +33,16 @@ public class SendMessageController {
         return "ok";
     }
 
+    @RequestMapping(value = "/sendTopicMessage1", method = RequestMethod.GET)
+    public String sendTopicMessage1(@RequestParam(value ="message") String message) {
+        String messageId = String.valueOf(UUID.randomUUID());
+        Map<String, Object> manMap = new HashMap<>();
+        manMap.put("messageId", messageId);
+        manMap.put("messageData", message);
+        manMap.put("createTime", createTime);
+        rabbitTemplate.convertAndSend("topicExchange", "topic.da", manMap);
+        return "ok";
+    }
+
 
 }

@@ -16,15 +16,22 @@ import java.util.Map;
  */
 @Log
 @Component
-@RabbitListener(queues = "topic.data")
 public class TopicTotalReceiver {
 
     @Autowired
     private MyWebsocket myWebsocket;
 
+    @RabbitListener(queues = "topic.data")
     @RabbitHandler
     public void process (Map testMessage){
         log.info(String.format("TopicTotalReceiver消费者收到消息： %s", JSON.toJSONString(testMessage)));
+        myWebsocket.sendMessage(JSON.toJSONString(testMessage));
+    }
+
+    @RabbitListener(queues = "topic.da")
+    @RabbitHandler
+    public void process1 (Map testMessage){
+        log.info(String.format("TopicDaReceiver消费者收到消息： %s", JSON.toJSONString(testMessage)));
         myWebsocket.sendMessage(JSON.toJSONString(testMessage));
     }
 }

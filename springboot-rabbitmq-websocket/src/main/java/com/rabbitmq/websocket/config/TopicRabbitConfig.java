@@ -14,10 +14,17 @@ import org.springframework.context.annotation.Configuration;
 public class TopicRabbitConfig {
     //绑定键
     public final static String DATA_QUEUE = "topic.data";
+    //绑定键
+    public final static String DA_QUEUE = "topic.da";
 
     @Bean
     public Queue firstQueue(){
         return new Queue(TopicRabbitConfig.DATA_QUEUE);
+    }
+
+    @Bean
+    public Queue secondQueue(){
+        return new Queue(TopicRabbitConfig.DA_QUEUE);
     }
 
     @Bean
@@ -28,5 +35,10 @@ public class TopicRabbitConfig {
     @Bean
     Binding bindingExchangeMessage(){
         return BindingBuilder.bind(firstQueue()).to(exchange()).with("topic.#");
+    }
+
+    @Bean
+    Binding bindingExchangeMessage1(){
+        return BindingBuilder.bind(secondQueue()).to(exchange()).with("topic.da");
     }
 }
