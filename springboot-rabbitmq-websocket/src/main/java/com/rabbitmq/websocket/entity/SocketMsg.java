@@ -5,8 +5,8 @@ package com.rabbitmq.websocket.entity;
  */
 public class SocketMsg {
     private String messageId;//发送者.
-    private String messageData;//接受者.
-    private String createTime;//消息
+    private String messageData;//消息内容.
+    private String createTime;//时间
 
     public String getMessageId() {
         return messageId;

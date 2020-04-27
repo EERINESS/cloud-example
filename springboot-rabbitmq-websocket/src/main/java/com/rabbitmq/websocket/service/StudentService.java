@@ -11,4 +11,8 @@ public interface StudentService {
     List<Student> selectAllStudent();
 
     List<Student>  selectStudentBySchoolId(int schoolId);
+
+    Integer updateStudent(Student student);
+
+    void updateWebsocket(int schoolId);
 }

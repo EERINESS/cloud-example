@@ -1,4 +1,4 @@
-package com.rabbitmq.websocket.controller;
+package com.rabbitmq.websocket.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.websocket.entity.SocketMsg;
@@ -10,15 +10,15 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * Created by zzq on 2020/4/20.
+ * Created by zzq on 2020/4/27.
  */
 @Log
 @ServerEndpoint(value = "/websocket")
 @Component
-public class MyWebsocket {
+public class RabbitMqWebsocket {
 
     // 用来存放每个客户端对应的MyWebSocket对象。
-    private static CopyOnWriteArraySet<MyWebsocket> websocketSet = new CopyOnWriteArraySet<>();
+    private static CopyOnWriteArraySet<RabbitMqWebsocket> websocketSet = new CopyOnWriteArraySet<>();
 
     // 与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
@@ -64,7 +64,7 @@ public class MyWebsocket {
             socketMsg = objectMapper.readValue(message, SocketMsg.class);
             //发送给前端消息
             //this.session.getBasicRemote().sendText(socketMsg.getMessageData());
-            for (MyWebsocket item : websocketSet){
+            for (RabbitMqWebsocket item : websocketSet){
                 item.session.getAsyncRemote().sendText(socketMsg.getMessageData());    // 异步发送消息
             }
         } catch (Exception e){
@@ -78,5 +78,4 @@ public class MyWebsocket {
         log.info(String.format("发生错误 : + %s", session.getId()));
         error.printStackTrace();
     }
-
 }

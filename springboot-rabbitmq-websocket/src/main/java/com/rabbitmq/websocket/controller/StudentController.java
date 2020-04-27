@@ -6,6 +6,7 @@ import com.rabbitmq.websocket.service.SchoolService;
 import com.rabbitmq.websocket.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,8 +33,18 @@ public class StudentController {
     }
 
     @GetMapping("get_student")
-    private List<Student>  selectStudentBySchoolId(@RequestParam("school_id") int schoolId){
+    public List<Student>  selectStudentBySchoolId(@RequestParam("school_id") int schoolId){
         return studentService.selectStudentBySchoolId(schoolId);
+    }
+
+    @GetMapping("update_student")
+    public Integer updateStudent(@RequestBody Student student){
+        return studentService.updateStudent(student);
+    }
+
+    @GetMapping("test")
+    public void testWebsocket(@RequestParam int id){
+        studentService.updateWebsocket(id);
     }
 
 }
