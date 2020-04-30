@@ -5,6 +5,7 @@ import com.rabbitmq.websocket.entity.Student;
 import com.rabbitmq.websocket.service.SchoolService;
 import com.rabbitmq.websocket.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +22,9 @@ public class StudentController {
     private StudentService studentService;
     @Autowired
     private SchoolService schoolService;
+    @Autowired
+    private RedisTemplate<Object, Object> redisTemplate;
+
 
     @GetMapping("/all_school")
     public List<School> selectAllSchool(){
@@ -29,11 +33,16 @@ public class StudentController {
 
     @GetMapping("/all_student")
     public List<Student> selectAllStudent(){
-        return studentService.selectAllStudent();
+        if (redisTemplate.hasKey("studentList")){
+            return studentService.selectAllStudent();
+        }else {
+            redisTemplate.opsForList().leftPush("studentList", studentService.selectAllStudent());
+            return studentService.selectAllStudent();
+        }
     }
 
     @GetMapping("get_student")
-    public List<Student>  selectStudentBySchoolId(@RequestParam("school_id") int schoolId){
+    public List<Student>  selectStudentBySchoolId(@RequestParam("school_id") String schoolId){
         return studentService.selectStudentBySchoolId(schoolId);
     }
 

@@ -15,8 +15,8 @@ public interface StudentMapper {
     @Select("select * from student")
     List<Student> selectAllStudent();
 
-    @Select("select * from student where school_id = #{schoolId}")
-    List<Student> selectStudentBySchoolId(int schoolId);
+    @Select("select * from student where school_id in (#{schoolId})")
+    List<Student> selectStudentBySchoolId(String schoolId);
 
     @Update("update student set name=#{name},sex=#{sex},school_id=#{schoolId} where id=#{id}")
     Integer updateStudent(Student student);

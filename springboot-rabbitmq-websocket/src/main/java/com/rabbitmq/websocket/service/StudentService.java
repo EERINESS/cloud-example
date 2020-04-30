@@ -10,7 +10,7 @@ import java.util.List;
 public interface StudentService {
     List<Student> selectAllStudent();
 
-    List<Student>  selectStudentBySchoolId(int schoolId);
+    List<Student>  selectStudentBySchoolId(String schoolId);
 
     Integer updateStudent(Student student);
 

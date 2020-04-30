@@ -12,7 +12,6 @@
         </style>
 </head>
 <body>
-用户ID：<input type="text" id="userId"/>
 学校：<select id="school">
     <option value="1">北京大学</option>
     <option value="2">清华大学</option>
@@ -34,11 +33,6 @@
 <script type="text/javascript">
     var websocket = null;
     function connectWebSocket(){
-        var userId = document.getElementById("userId").value;
-        if(userId === ""){
-            alert("请输入用户ID");
-            return;
-        }
         var school = document.getElementById("school").value;
         if(school === ""){
             alert("请选择学校");
@@ -57,8 +51,7 @@
         //连接成功建立的回调方法
         websocket.onopen = function(event) {
             setMessageInnerHTML("Loc MSG: 成功建立连接");
-            send(userId, school);
-            get(school);
+            send(school);
         }
         //接收到消息的回调方法
         websocket.onmessage = function(event) {
@@ -82,10 +75,10 @@
         websocket.close();
     }
     //发送消息
-    function send(userId, school) {
+    function send(school) {
+        var school1 = school + ",2";
         // 将获取的输入文本信息进行发送
-        var data = {schoolId:school,userId:userId};
-        var webData = {code:101,data:data};
+        var webData = {code:101,data:school1};
         websocket.send(JSON.stringify(webData));
     }
 </script>
