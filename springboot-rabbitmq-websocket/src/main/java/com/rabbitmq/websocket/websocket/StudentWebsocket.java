@@ -1,8 +1,11 @@
 package com.rabbitmq.websocket.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.websocket.AppUtil;
 import com.rabbitmq.websocket.entity.WebReturn;
+import com.rabbitmq.websocket.service.CacheService;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -18,11 +21,13 @@ import java.util.*;
  */
 @Log
 @ServerEndpoint(value = "/student")
-@Component
 public class StudentWebsocket {
-
-    @Value("${server.port}")
+//
+//    @Value("${server.port}")
     String port;
+//
+//    @Autowired
+    CacheService cacheService = AppUtil.applicationContext.getBean(CacheService.class);
 
     /**
      * 连接建立成功调用的方法
@@ -32,12 +37,17 @@ public class StudentWebsocket {
         log.info("有新连接加入");
     }
 
+
+    CacheService getCacheService() {
+        return AppUtil.applicationContext.getBean(CacheService.class);
+    }
     /**
      * 连接关闭调用的方法
      */
     @OnClose
     public void onClose(Session session){
         log.info("有一连接关闭");
+        cacheService.deleteCacheBySession(session.getId());
         //deleteCacheBySession(session.getId());
     }
 
@@ -60,7 +70,7 @@ public class StudentWebsocket {
                 Map<String, Object> mapObj = new HashMap<>();
                 mapObj.put("session", session);
                 mapObj.put("schoolId", webReturn.getData());
-                //saveCache(session.getId(), mapObj);
+                cacheService.saveCache(session.getId(), mapObj);
             }
         } catch (Exception e){
             e.printStackTrace();
