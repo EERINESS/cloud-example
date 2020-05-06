@@ -1,21 +1,17 @@
 package com.rabbitmq.websocket.websocket;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.websocket.entity.WebReturn;
-import com.rabbitmq.websocket.service.RedisService;
-import com.rabbitmq.websocket.util.SpringUtils;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zzq on 2020/4/27.
@@ -25,17 +21,8 @@ import java.util.Map;
 @Component
 public class StudentWebsocket {
 
-    private StringRedisTemplate stringRedisTemplate = SpringUtils.getBean(StringRedisTemplate.class);
-
-    @Autowired
-    private RedisTemplate<Object, Object> redisTemplate;
-
-    @Autowired
-    private RedisService redisService;
-
     @Value("${server.port}")
     String port;
-    public static final String WEBSOCKET_SESSION = "websocketSession";
 
     /**
      * 连接建立成功调用的方法
@@ -50,11 +37,8 @@ public class StudentWebsocket {
      */
     @OnClose
     public void onClose(Session session){
-        Map<String, Map<String, Object>> map = JSON.parseObject(stringRedisTemplate.opsForValue().get("websocketSession"), Map.class);
-        map.remove(session.getId());
-//        stringRedisTemplate.opsForValue().set("websocketSession", JSON.toJSONString(map));
-        redisService.set(WEBSOCKET_SESSION, JSON.toJSONString(map));
         log.info("有一连接关闭");
+        //deleteCacheBySession(session.getId());
     }
 
     /**
@@ -73,17 +57,10 @@ public class StudentWebsocket {
                 session.getAsyncRemote().sendText(webReturn.getData().toString());
             }else if (webReturn.getCode() == 101){
                 log.info("sessionId : " + session.getId());
-                Map<String, Map<String, Object>> map;
-                if (redisService.get(WEBSOCKET_SESSION) != null){
-                    map = JSON.parseObject(redisService.get(WEBSOCKET_SESSION), Map.class);
-                }else{
-                    map = new HashMap<>();
-                }
                 Map<String, Object> mapObj = new HashMap<>();
                 mapObj.put("session", session);
                 mapObj.put("schoolId", webReturn.getData());
-                map.put(session.getId(), mapObj);
-                redisService.set(WEBSOCKET_SESSION, JSON.toJSONString(map));
+                //saveCache(session.getId(), mapObj);
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -124,4 +101,7 @@ public class StudentWebsocket {
     public void onError(Session session, Throwable error){
         log.info(String.format("发生错误 : + %s", session.getId()));
     }
+
+
+
 }
