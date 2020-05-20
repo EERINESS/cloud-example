@@ -76,7 +76,7 @@
     }
     //发送消息
     function send(school) {
-        var school1 = school + ",2";
+        var school1 = school;
         // 将获取的输入文本信息进行发送
         var webData = {code:101,data:school1};
         websocket.send(JSON.stringify(webData));

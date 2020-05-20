@@ -1,9 +1,11 @@
 package com.rabbitmq.websocket.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by zzq on 2020/4/27.
  */
-public class WebReturn<T> {
+public class WebReturn<T> implements Serializable {
     private boolean result;
     private int code;
     private String msg;

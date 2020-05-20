@@ -5,11 +5,6 @@ import com.rabbitmq.websocket.AppUtil;
 import com.rabbitmq.websocket.entity.WebReturn;
 import com.rabbitmq.websocket.service.CacheService;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -21,13 +16,11 @@ import java.util.*;
  */
 @Log
 @ServerEndpoint(value = "/student")
+@Component
 public class StudentWebsocket {
-//
-//    @Value("${server.port}")
-    String port;
-//
-//    @Autowired
-    CacheService cacheService = AppUtil.applicationContext.getBean(CacheService.class);
+
+    //CacheService cacheService = AppUtil.applicationContext.getBean(CacheService.class);
+    public static Map<String, Map<String, Object>> sessionMap = new HashMap<>();
 
     /**
      * 连接建立成功调用的方法
@@ -37,18 +30,14 @@ public class StudentWebsocket {
         log.info("有新连接加入");
     }
 
-
-    CacheService getCacheService() {
-        return AppUtil.applicationContext.getBean(CacheService.class);
-    }
     /**
      * 连接关闭调用的方法
      */
     @OnClose
     public void onClose(Session session){
         log.info("有一连接关闭");
-        cacheService.deleteCacheBySession(session.getId());
-        //deleteCacheBySession(session.getId());
+        //cacheService.deleteCacheBySession(session.getId());
+        sessionMap.remove(session.getId());
     }
 
     /**
@@ -57,61 +46,30 @@ public class StudentWebsocket {
      */
     @OnMessage
     public void onMessage(Session session, String message){
-        log.info("port : " + port);
         log.info(message);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             WebReturn webReturn = objectMapper.readValue(message, WebReturn.class);
             if (webReturn.getCode() == 202){
                 //发送给前端消息
-                session.getAsyncRemote().sendText(webReturn.getData().toString());
+                session.getBasicRemote().sendText(webReturn.getData().toString());
             }else if (webReturn.getCode() == 101){
                 log.info("sessionId : " + session.getId());
                 Map<String, Object> mapObj = new HashMap<>();
                 mapObj.put("session", session);
                 mapObj.put("schoolId", webReturn.getData());
-                cacheService.saveCache(session.getId(), mapObj);
+                //cacheService.saveCache(session.getId(), mapObj);
+                sessionMap.put(session.getId(), mapObj);
             }
         } catch (Exception e){
             e.printStackTrace();
         }
 
     }
-//    @OnMessage
-//    public void onMessage(Session session, String message){
-//        log.info("port : " + port);
-//        log.info(message);
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        try {
-//            WebReturn webReturn = objectMapper.readValue(message, WebReturn.class);
-//            if (webReturn.getCode() == 202){
-//                //发送给前端消息
-//                session.getAsyncRemote().sendText(webReturn.getData().toString());
-//            }else if (webReturn.getCode() == 101){
-//                log.info("sessionId : " + session.getId());
-//                Map<String, Map<String, Object>> map;
-//                if (stringRedisTemplate.opsForValue().get("websocketSession") != null){
-//                    map = JSON.parseObject(stringRedisTemplate.opsForValue().get("websocketSession"), Map.class);
-//                }else{
-//                    map = new HashMap<>();
-//                }
-//                Map<String, Object> mapObj = new HashMap<>();
-//                mapObj.put("session", session);
-//                mapObj.put("schoolId", webReturn.getData());
-//                map.put(session.getId(), mapObj);
-//                stringRedisTemplate.opsForValue().set("websocketSession", JSON.toJSONString(map));
-//            }
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
-//
-//    }
 
     @OnError
     public void onError(Session session, Throwable error){
         log.info(String.format("发生错误 : + %s", session.getId()));
     }
-
-
 
 }
