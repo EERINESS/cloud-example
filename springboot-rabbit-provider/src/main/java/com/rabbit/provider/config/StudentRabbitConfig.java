@@ -1,0 +1,39 @@
+package com.rabbit.provider.config;
+
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Created by zzq on 2020/7/8.
+ */
+@Configuration
+public class StudentRabbitConfig {
+    //绑定键
+    public final static String update = "student.update";
+
+    @Bean
+    public Queue firstQueue() {
+        return new Queue(StudentRabbitConfig.update);
+    }
+
+    @Bean
+    TopicExchange exchange() {
+        return new TopicExchange("studentExchange");
+    }
+
+    /**
+     * 将firstQueue和topicExchange绑定,而且绑定的键值为student.update
+     * 这样只要是消息携带的路由键是student.update,才会分发到该队列
+     * @return
+     */
+    @Bean
+    Binding bindingExchangeMessage() {
+        return BindingBuilder.bind(firstQueue()).to(exchange()).with(update);
+    }
+
+
+}

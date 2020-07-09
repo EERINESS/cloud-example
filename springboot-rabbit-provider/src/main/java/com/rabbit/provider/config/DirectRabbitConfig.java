@@ -15,28 +15,28 @@ import org.springframework.context.annotation.Configuration;
  * 大致流程，有一个队列绑定到一个直连交换机上，同时赋予一个路由键 routing key 。
  * 然后当一个消息携带着路由值为X，这个消息通过生产者发送给交换机时，交换机就会根据这个路由值X去寻找绑定值也是X的队列。
  */
-@Configuration
+//@Configuration
 public class DirectRabbitConfig {
 
     // 队列 起名：TestDirectQueue
-    @Bean
+    //@Bean
     public Queue TestDirectQueue(){
         return new Queue("TestDirectQueue", true);
     }
 
     // Direct 交换机 起名：TestDirectExchange
-    @Bean
+    //@Bean
     DirectExchange TestDirectExchange(){
         return new DirectExchange("TestDirectExchange");
     }
 
     // 绑定 将队列和交换机绑定, 并设置用于匹配键：TestDirectRouting
-    @Bean
+    //@Bean
     Binding bindingDirect(){
         return BindingBuilder.bind(TestDirectQueue()).to(TestDirectExchange()).with("TestDirectRouting");
     }
 
-    @Bean
+    //@Bean
     DirectExchange lonelyDirectExchange() {
         return new DirectExchange("lonelyDirectExchange");
     }

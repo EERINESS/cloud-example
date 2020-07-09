@@ -2,6 +2,7 @@ package com.rabbitmq.websocket.service.impl;
 
 import com.rabbitmq.websocket.service.CacheService;
 import lombok.extern.java.Log;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -14,6 +15,7 @@ import java.util.Map;
  */
 @Log
 @Service
+@CacheConfig(cacheNames = "websocket")
 public class CacheServiceImpl implements CacheService {
     /**
      * 保存用户session到播放列表中
@@ -23,8 +25,9 @@ public class CacheServiceImpl implements CacheService {
      */
     @CachePut(cacheNames = "websocket", key = "#sessionId")
     @Override
-    public void saveCache(String sessionId, Map<String, Object> group){
+    public Map<String, Object> saveCache(String sessionId, Map<String, Object> group){
         log.info("save value " + group.get("schoolId") + " with sessionId  -->" + sessionId);
+        return  group;
     }
 
     /**

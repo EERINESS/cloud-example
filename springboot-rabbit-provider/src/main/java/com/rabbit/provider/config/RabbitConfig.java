@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Created by zzq on 2020/4/16.
  */
-@Configuration
+//@Configuration
 public class RabbitConfig {
 
-    @Bean
+    //@Bean
     public RabbitTemplate createRabbitTemplate(ConnectionFactory connectionFactory){
         RabbitTemplate rabbitTemplate = new RabbitTemplate();
         rabbitTemplate.setConnectionFactory(connectionFactory);

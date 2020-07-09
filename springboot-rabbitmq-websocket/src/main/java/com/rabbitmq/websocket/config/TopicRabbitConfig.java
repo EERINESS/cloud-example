@@ -10,34 +10,34 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Created by zzq on 2020/4/20.
  */
-@Configuration
+//@Configuration
 public class TopicRabbitConfig {
     //绑定键
     public final static String DATA_QUEUE = "topic.data";
     //绑定键
     public final static String DA_QUEUE = "topic.da";
 
-    @Bean
+    //@Bean
     public Queue firstQueue(){
         return new Queue(TopicRabbitConfig.DATA_QUEUE);
     }
 
-    @Bean
+    //@Bean
     public Queue secondQueue(){
         return new Queue(TopicRabbitConfig.DA_QUEUE);
     }
 
-    @Bean
+    //@Bean
     TopicExchange exchange(){
         return new TopicExchange("topicExchange");
     }
 
-    @Bean
+    //@Bean
     Binding bindingExchangeMessage(){
         return BindingBuilder.bind(firstQueue()).to(exchange()).with("topic.#");
     }
 
-    @Bean
+    //@Bean
     Binding bindingExchangeMessage1(){
         return BindingBuilder.bind(secondQueue()).to(exchange()).with("topic.da");
     }

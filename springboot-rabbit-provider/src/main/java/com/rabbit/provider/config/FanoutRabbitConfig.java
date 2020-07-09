@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * Fanout Exchange
  * 扇型交换机，这个交换机没有路由键概念，就算你绑了路由键也是无视的。 这个交换机在接收到消息后，会直接转发到绑定到它上面的所有队列。
  */
-@Configuration
+//@Configuration
 public class FanoutRabbitConfig {
 
 
@@ -23,37 +23,37 @@ public class FanoutRabbitConfig {
      *  因为是扇型交换机, 路由键无需配置,配置也不起作用
      */
 
-    @Bean
+    //@Bean
     public Queue queueA() {
         return new Queue("fanout.A");
     }
 
-    @Bean
+    //@Bean
     public Queue queueB() {
         return new Queue("fanout.B");
     }
 
-    @Bean
+    //@Bean
     public Queue queueC() {
         return new Queue("fanout.C");
     }
 
-    @Bean
+    //@Bean
     FanoutExchange fanoutExchange() {
         return new FanoutExchange("fanoutExchange");
     }
 
-    @Bean
+    //@Bean
     Binding bindingExchangeA() {
         return BindingBuilder.bind(queueA()).to(fanoutExchange());
     }
 
-    @Bean
+    //@Bean
     Binding bindingExchangeB() {
         return BindingBuilder.bind(queueB()).to(fanoutExchange());
     }
 
-    @Bean
+    //@Bean
     Binding bindingExchangeC() {
         return BindingBuilder.bind(queueC()).to(fanoutExchange());
     }

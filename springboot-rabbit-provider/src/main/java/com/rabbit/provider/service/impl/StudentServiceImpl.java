@@ -1,14 +1,11 @@
-package com.rabbitmq.websocket.service.impl;
+package com.rabbit.provider.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.rabbitmq.websocket.AppUtil;
-import com.rabbitmq.websocket.entity.Student;
-import com.rabbitmq.websocket.entity.WebReturn;
-import com.rabbitmq.websocket.mapper.StudentMapper;
-import com.rabbitmq.websocket.service.CacheService;
-import com.rabbitmq.websocket.service.StudentService;
-import com.rabbitmq.websocket.websocket.StudentWebsocket;
-import lombok.extern.java.Log;
+import com.rabbit.provider.entity.Student;
+import com.rabbit.provider.entity.WebReturn;
+import com.rabbit.provider.mapper.StudentMapper;
+import com.rabbit.provider.service.CacheService;
+import com.rabbit.provider.service.StudentService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,20 +16,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by zzq on 2020/4/21.
+ * Created by zzq on 2020/7/9.
  */
-@Log
 @Service
 public class StudentServiceImpl implements StudentService {
     @Autowired
     private StudentMapper studentMapper;
     @Autowired
     RabbitTemplate rabbitTemplate;
-//    @Autowired
-//    private CacheService cacheService;
     @Autowired
-    StudentWebsocket studentWebsocket;
-    CacheService cacheService = AppUtil.applicationContext.getBean(CacheService.class);
+    private CacheService cacheService;
+
+    public static Map<String, Map<String, Object>> sessionMap = new HashMap<>();
 
     @Override
     public List<Student> selectAllStudent() {
@@ -53,11 +48,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void updateWebsocket(int schoolId){
         WebReturn webReturn  = new WebReturn();
-        if (cacheService.gainCache() == null){
-            return;
-        }
+//        if (cacheService.gainCache() == null){
+//            return;
+//        }
         //Map<String, Map<String, Object>> mapMap = StudentWebsocket.sessionMap;
-        Map<String, Map<String, Object>> mapMap = cacheService.gainCache();
+        Map<String, Map<String, Object>> mapMap = new HashMap<>();
         Session session;
         for (Map map : mapMap.values()){
             String mapSchoolId = map.get("schoolId").toString();
@@ -72,13 +67,11 @@ public class StudentServiceImpl implements StudentService {
                         Map<String, Object> map1 = new HashMap<>();
                         map1.put("session", session);
                         map1.put("result", webReturn);
-                        //rabbitTemplate.convertAndSend("topicExchange", "topic.da", JSON.toJSONString(map1));
-                        studentWebsocket.onMessage(session, JSON.toJSONString(webReturn));
+                        rabbitTemplate.convertAndSend("topicExchange", "topic.da", JSON.toJSONString(map1));
                         break;
                     }
                 }
             }
         }
     }
-
 }

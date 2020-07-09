@@ -2,6 +2,7 @@ package com.rabbitmq.websocket.controller;
 
 import com.rabbitmq.websocket.entity.School;
 import com.rabbitmq.websocket.entity.Student;
+import com.rabbitmq.websocket.feign.StudentClient;
 import com.rabbitmq.websocket.service.SchoolService;
 import com.rabbitmq.websocket.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,23 @@ public class StudentController {
     private SchoolService schoolService;
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
+    @Autowired
+    private StudentClient studentClient;
+
+    @GetMapping("get_student")
+    public List<Student>  selectStudentBySchoolId(@RequestParam("school_id") String schoolId){
+        return studentClient.selectStudentBySchoolId(schoolId);
+    }
+
+    @GetMapping("update_student")
+    public Integer updateStudent(@RequestBody Student student){
+        return studentClient.updateStudent(student);
+    }
+
+    @GetMapping("test")
+    public void testWebsocket(@RequestParam int id){
+        studentService.updateWebsocket(id);
+    }
 
 
     @GetMapping("/all_school")
@@ -40,20 +58,4 @@ public class StudentController {
             return studentService.selectAllStudent();
         }
     }
-
-    @GetMapping("get_student")
-    public List<Student>  selectStudentBySchoolId(@RequestParam("school_id") String schoolId){
-        return studentService.selectStudentBySchoolId(schoolId);
-    }
-
-    @GetMapping("update_student")
-    public Integer updateStudent(@RequestBody Student student){
-        return studentService.updateStudent(student);
-    }
-
-    @GetMapping("test")
-    public void testWebsocket(@RequestParam int id){
-        studentService.updateWebsocket(id);
-    }
-
 }

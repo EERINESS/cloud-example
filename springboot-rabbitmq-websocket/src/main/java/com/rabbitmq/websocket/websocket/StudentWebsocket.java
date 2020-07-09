@@ -19,8 +19,8 @@ import java.util.*;
 @Component
 public class StudentWebsocket {
 
-    //CacheService cacheService = AppUtil.applicationContext.getBean(CacheService.class);
-    public static Map<String, Map<String, Object>> sessionMap = new HashMap<>();
+    CacheService cacheService = AppUtil.applicationContext.getBean(CacheService.class);
+    //public static Map<String, Map<String, Object>> sessionMap = new HashMap<>();
 
     /**
      * 连接建立成功调用的方法
@@ -36,8 +36,8 @@ public class StudentWebsocket {
     @OnClose
     public void onClose(Session session){
         log.info("有一连接关闭");
-        //cacheService.deleteCacheBySession(session.getId());
-        sessionMap.remove(session.getId());
+        cacheService.deleteCacheBySession(session.getId());
+        //sessionMap.remove(session.getId());
     }
 
     /**
@@ -58,8 +58,8 @@ public class StudentWebsocket {
                 Map<String, Object> mapObj = new HashMap<>();
                 mapObj.put("session", session);
                 mapObj.put("schoolId", webReturn.getData());
-                //cacheService.saveCache(session.getId(), mapObj);
-                sessionMap.put(session.getId(), mapObj);
+                cacheService.saveCache(session.getId(), mapObj);
+                //sessionMap.put(session.getId(), mapObj);
             }
         } catch (Exception e){
             e.printStackTrace();

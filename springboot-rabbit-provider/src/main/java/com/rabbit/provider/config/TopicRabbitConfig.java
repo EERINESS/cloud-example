@@ -13,23 +13,23 @@ import org.springframework.context.annotation.Configuration;
  * Topic Exchange
  * 主题交换机，这个交换机其实跟直连交换机流程差不多，但是它的特点就是在它的路由键和绑定键之间是有规则的。
  */
-@Configuration
+//@Configuration
 public class TopicRabbitConfig {
     //绑定键
     public final static String man = "topic.man";
     public final static String woman = "topic.woman";
 
-    @Bean
+    //@Bean
     public Queue firstQueue() {
         return new Queue(TopicRabbitConfig.man);
     }
 
-    @Bean
+    //@Bean
     public Queue secondQueue() {
         return new Queue(TopicRabbitConfig.woman);
     }
 
-    @Bean
+    //@Bean
     TopicExchange exchange() {
         return new TopicExchange("topicExchange");
     }
@@ -39,7 +39,7 @@ public class TopicRabbitConfig {
      * 这样只要是消息携带的路由键是topic.man,才会分发到该队列
      * @return
      */
-    @Bean
+    //@Bean
     Binding bindingExchangeMessage() {
         return BindingBuilder.bind(firstQueue()).to(exchange()).with(man);
     }
@@ -49,7 +49,7 @@ public class TopicRabbitConfig {
      * 这样只要是消息携带的路由键是以topic.开头,都会分发到该队列
      * @return
      */
-    @Bean
+    //@Bean
     Binding bindingExchangeMessage2() {
         return BindingBuilder.bind(secondQueue()).to(exchange()).with("topic.#");
     }
