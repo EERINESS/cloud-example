@@ -11,7 +11,7 @@ import java.util.List;
 public interface CacheService {
     Integer insertWebsocketSession(WebsocketSession session);
 
-    List<WebsocketSession> deleteWebsocketSessionBySchoolId(String schoolId);
+    Integer deleteWebsocketSessionBySchoolId(String schoolId);
 
     Integer updateWebsocketSession(WebsocketSession session);
 

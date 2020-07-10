@@ -28,7 +28,7 @@ public class CacheServiceImpl implements CacheService {
 
     @CacheEvict(key="#id")
     @Override
-    public List<WebsocketSession> deleteWebsocketSessionBySchoolId(String schoolId) {
+    public Integer deleteWebsocketSessionBySchoolId(String schoolId) {
         return websocketSessionMapper.deleteWebsocketSessionBySchoolId(schoolId);
     }
 

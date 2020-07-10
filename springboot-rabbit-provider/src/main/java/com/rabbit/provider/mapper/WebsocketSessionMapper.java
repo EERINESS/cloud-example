@@ -10,11 +10,11 @@ import java.util.List;
  */
 @Mapper
 public interface WebsocketSessionMapper {
-    @Insert("insert into websocket_session set session_id=#{sessionId},school_id=#{schoolId}")
+    @Insert("insert into websocket_session values(#{sessionId},#{schoolId})")
     Integer insertWebsocketSession(WebsocketSession session);
 
-    @Delete("select * from websocket_session where school_id in (#{schoolId})")
-    List<WebsocketSession> deleteWebsocketSessionBySchoolId(String schoolId);
+    @Delete("delete from websocket_session where school_id in (#{schoolId})")
+    Integer deleteWebsocketSessionBySchoolId(String schoolId);
 
     @Update("update websocket_session set school_id=#{schoolId} where session_id=#{sessionId}")
     Integer updateWebsocketSession(WebsocketSession session);
