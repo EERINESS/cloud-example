@@ -1,15 +1,19 @@
 package com.rabbitmq.websocket.websocket;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.websocket.AppUtil;
-import com.rabbitmq.websocket.entity.WebReturn;
-import com.rabbitmq.websocket.service.CacheService;
+import com.rabbitmq.websocket.entity.WebsocketInfo;
 import lombok.extern.java.Log;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by zzq on 2020/4/27.
@@ -19,8 +23,8 @@ import java.util.*;
 @Component
 public class StudentWebsocket {
 
-    CacheService cacheService = AppUtil.applicationContext.getBean(CacheService.class);
-    //public static Map<String, Map<String, Object>> sessionMap = new HashMap<>();
+    StringRedisTemplate stringRedisTemplate = AppUtil.applicationContext.getBean(StringRedisTemplate.class);
+    public static Map<String, Session> sessionMap = new HashMap<>();
 
     /**
      * 连接建立成功调用的方法
@@ -36,8 +40,18 @@ public class StudentWebsocket {
     @OnClose
     public void onClose(Session session){
         log.info("有一连接关闭");
-        cacheService.deleteCacheBySession(session.getId());
-        //sessionMap.remove(session.getId());
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        String websocketStr = operations.get("websocket_session");
+        List<WebsocketInfo> websocketInfoList;
+        if (websocketStr == null) {
+           return;
+        }else {
+            JSONArray jsonArray = JSONArray.parseArray(websocketStr);
+            websocketInfoList = jsonArray.toJavaList(WebsocketInfo.class);
+            websocketInfoList = websocketInfoList.stream().filter(info -> !session.getId().equals(info.getSessionId())).collect(Collectors.toList());
+        }
+        operations.set("websocket_session", JSON.toJSONString(websocketInfoList));
+        log.info("session : " + session.getId() + " 失去连接，从redis中剔除");
     }
 
     /**
@@ -46,21 +60,33 @@ public class StudentWebsocket {
      */
     @OnMessage
     public void onMessage(Session session, String message){
-        log.info(message);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            WebReturn webReturn = objectMapper.readValue(message, WebReturn.class);
-            if (webReturn.getCode() == 202){
-                //发送给前端消息
-                session.getBasicRemote().sendText(webReturn.getData().toString());
-            }else if (webReturn.getCode() == 101){
-                log.info("sessionId : " + session.getId());
-                Map<String, Object> mapObj = new HashMap<>();
-                mapObj.put("session", session);
-                mapObj.put("schoolId", webReturn.getData());
-                cacheService.saveCache(session.getId(), mapObj);
-                //sessionMap.put(session.getId(), mapObj);
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+            String websocketStr = operations.get("websocket_session");
+            List<WebsocketInfo> websocketInfoList;
+            if (websocketStr == null) {
+                websocketInfoList = new ArrayList<>();
+            }else {
+                JSONArray jsonArray = JSONArray.parseArray(websocketStr);
+                websocketInfoList = jsonArray.toJavaList(WebsocketInfo.class);
             }
+            WebsocketInfo websocketInfo = objectMapper.readValue(message, WebsocketInfo.class);
+            if (websocketInfo.getType() == 202){
+                if (session == null){
+                    log.info("session : " + websocketInfo.getSessionId() + " 失去连接，从redis中剔除");
+                    websocketInfoList = websocketInfoList.stream().filter(info -> !websocketInfo.getSessionId().equals(info.getSessionId())).collect(Collectors.toList());
+                }else {
+                    //发送给前端消息
+                    session.getBasicRemote().sendText(JSON.toJSONString(websocketInfo.getStudentList()));
+                }
+            }else if (websocketInfo.getType() == 101){
+                log.info("sessionId : " + session.getId());
+                websocketInfo.setSessionId(session.getId());
+                websocketInfoList.add(websocketInfo);
+                sessionMap.put(session.getId(), session);
+            }
+            operations.set("websocket_session", JSON.toJSONString(websocketInfoList));
         } catch (Exception e){
             e.printStackTrace();
         }

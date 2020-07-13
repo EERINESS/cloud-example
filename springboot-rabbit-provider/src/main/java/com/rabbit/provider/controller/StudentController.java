@@ -43,7 +43,12 @@ public class StudentController {
 
     @GetMapping("test")
     @ApiOperation(value = "测试student信息")
-    public void testWebsocket(@RequestParam @ApiParam(value = "student的ID", example = "0") int id ){
+    public List<Student> testWebsocket(){
+        return studentService.getStudent();
+    }
 
+    @GetMapping("refresh_student")
+    public void refreshStudent(@RequestParam("school_id") @ApiParam(value = "school的ID", example = "0") String schoolId){
+        studentService.refreshStudent(schoolId);
     }
 }

@@ -14,5 +14,7 @@ public interface StudentService {
 
     Integer updateStudent(Student student);
 
-    void updateWebsocket(int schoolId);
+    List<Student> getStudent();
+
+    void refreshStudent(String schoolId);
 }

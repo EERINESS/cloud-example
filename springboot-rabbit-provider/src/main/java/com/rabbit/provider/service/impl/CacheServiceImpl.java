@@ -6,6 +6,7 @@ import com.rabbit.provider.service.CacheService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,36 +16,37 @@ import java.util.List;
  */
 @Log
 @Service
-@CacheConfig(cacheNames = "websocket")
+//@CacheConfig(cacheNames = "websocket")
 public class CacheServiceImpl implements CacheService {
+
     @Autowired
     private WebsocketSessionMapper websocketSessionMapper;
 
-    @CachePut(key = "#result.sessionId",condition = "#result!=null")
+    //@CachePut(key = "#result.sessionId",condition = "#result!=null")
     @Override
     public Integer insertWebsocketSession(WebsocketSession session) {
         return websocketSessionMapper.insertWebsocketSession(session);
     }
 
-    @CacheEvict(key="#id")
+    //@CacheEvict(key="#id")
     @Override
     public Integer deleteWebsocketSessionBySchoolId(String schoolId) {
         return websocketSessionMapper.deleteWebsocketSessionBySchoolId(schoolId);
     }
 
-    @CachePut(key = "#result.sessionId",condition = "#result!=null")
+    //@CachePut(key = "#result.sessionId",condition = "#result!=null")
     @Override
     public Integer updateWebsocketSession(WebsocketSession session) {
         return websocketSessionMapper.updateWebsocketSession(session);
     }
 
-    @Caching(
-            cacheable = {@Cacheable(key="#sessionId")},
-            put = {
-                    @CachePut(key="#result.sessionId"),
-                    @CachePut(key="#result.schoolId")
-            }
-    )
+//    @Caching(
+//            cacheable = {@Cacheable(key="#sessionId")},
+//            put = {
+//                    @CachePut(key="#result.sessionId"),
+//                    @CachePut(key="#result.schoolId")
+//            }
+//    )
     @Override
     public WebsocketSession selectWebsocketSessionBySessionId(String sessionId) {
         return websocketSessionMapper.selectWebsocketSessionBySessionId(sessionId);

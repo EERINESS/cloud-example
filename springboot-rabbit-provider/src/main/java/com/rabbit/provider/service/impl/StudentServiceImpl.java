@@ -1,13 +1,18 @@
 package com.rabbit.provider.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.rabbit.provider.entity.Student;
 import com.rabbit.provider.entity.WebReturn;
+import com.rabbit.provider.entity.WebsocketInfo;
 import com.rabbit.provider.mapper.StudentMapper;
-import com.rabbit.provider.service.CacheService;
 import com.rabbit.provider.service.StudentService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.websocket.Session;
@@ -25,9 +30,42 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     RabbitTemplate rabbitTemplate;
     @Autowired
-    private CacheService cacheService;
+    private StringRedisTemplate stringRedisTemplate;
 
-    public static Map<String, Map<String, Object>> sessionMap = new HashMap<>();
+
+    @Override
+    public void refreshStudent(String schoolId){
+        List<Student> studentList = selectStudentBySchoolId(schoolId);
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        String websocketStr = operations.get("websocket_session");
+        if (websocketStr != null){
+            JSONArray jsonArray = JSONArray.parseArray(websocketStr);
+            List<WebsocketInfo> websocketInfoList = jsonArray.toJavaList(WebsocketInfo.class);
+            for (WebsocketInfo websocketInfo : websocketInfoList){
+                if (websocketInfo.getSchoolId().indexOf(schoolId) != -1){
+                    websocketInfo.setStudentList(studentList);
+                    websocketInfo.setType(202);
+                    rabbitTemplate.convertAndSend("studentExchange", "student.update", JSON.toJSONString(websocketInfo));
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<Student> getStudent(){
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        String agentStatusStr = operations.get("agent_status");
+        List<Student> studentList;
+        if (agentStatusStr == null){
+            studentList = selectAllStudent();
+            String studentStr = JSONObject.toJSONString(studentList);
+            operations.set("agent_status", studentStr);
+        }else {
+            JSONArray jsonArray = JSONArray.parseArray(agentStatusStr);
+            studentList = jsonArray.toJavaList(Student.class);
+        }
+        return studentList;
+    }
 
     @Override
     public List<Student> selectAllStudent() {
@@ -43,35 +81,5 @@ public class StudentServiceImpl implements StudentService {
     public Integer updateStudent(Student student) {
         Integer count = studentMapper.updateStudent(student);
         return count;
-    }
-
-    @Override
-    public void updateWebsocket(int schoolId){
-        WebReturn webReturn  = new WebReturn();
-//        if (cacheService.gainCache() == null){
-//            return;
-//        }
-        //Map<String, Map<String, Object>> mapMap = StudentWebsocket.sessionMap;
-        Map<String, Map<String, Object>> mapMap = new HashMap<>();
-        Session session;
-        for (Map map : mapMap.values()){
-            String mapSchoolId = map.get("schoolId").toString();
-            String[] arrayId = mapSchoolId.split(",");
-            for (String id : arrayId){
-                if (Integer.valueOf(id) == schoolId){
-                    session = (Session) map.get("session");
-                    if (session != null){
-                        List<Student> studentList = selectStudentBySchoolId(mapSchoolId);
-                        webReturn.setData(studentList);
-                        webReturn.setCode(202);
-                        Map<String, Object> map1 = new HashMap<>();
-                        map1.put("session", session);
-                        map1.put("result", webReturn);
-                        rabbitTemplate.convertAndSend("topicExchange", "topic.da", JSON.toJSONString(map1));
-                        break;
-                    }
-                }
-            }
-        }
     }
 }

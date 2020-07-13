@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * Topic Exchange
  * 主题交换机，这个交换机其实跟直连交换机流程差不多，但是它的特点就是在它的路由键和绑定键之间是有规则的。
  */
-//@Configuration
+@Configuration
 public class TopicRabbitConfig {
     //绑定键
     public final static String man = "topic.man";
